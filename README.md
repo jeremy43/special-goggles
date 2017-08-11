@@ -66,10 +66,17 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 ## Evaluation Results
 
 
-|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP@0.5</sub> | <sub>time/image</br> (Tesla K40)</sub> | <sub>time/image</br>(Maxwell Titan X)</sub> |
-|---------------------------------|-------------------|--------------|---------|---------|--------|
-| <sub>Frame baseline</br>(R-FCN, ResNet-v1-101)</sub>                    | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1    | 0.271s    | 0.133s |
-| <sub>Flow-Guided Feature Aggregationw</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 73.0    | 0.073s    | 0.034s |
+|                                 | <sub>small</sub>     | <sub>middle</sub> | <sub>large</sub> | <sub>all area</sub> |
+|---------------------------------|----------------------|-------------------|------------------|---------------------|
+| <sub>mAP(%)(slow)</sub>         | 0.3803 | 0.4886 | 0.8732   | 0.8258    |
+| <sub>mAP(%)(medium)</sub>       | 0.3475 | 0.5292 | 0.8732   | 0.8258    |
+| <sub>mAP(%)(fast)</sub>         | 0.2439 | 0.4097 | 0.6341   | 0.4839    |
+| <sub>mAP(%)(all motion)</sub>   | 0.2367 | 0.4858 | 0.8340   | '0.7293'  |
+
+*Detection accuracy of small (area < 50^2 pixels), medium (50^2 ≤ area ≤ 150^2 pixels), and large (area > 150^2 pixels) object instances with respect to slow (motion iou < 0.7), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou > 0.9) object instances.
+*The last row is the accuracy of object instances with different areas without considering instance motions, and the last column is the accuracy of object instances with different motions without considering instance areas.
+*The last cell is the mAP of all object instances.
+
 
 ## Requirements: Software
 

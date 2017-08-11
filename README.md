@@ -71,7 +71,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 | <sub>mAP(%)(slow)</sub>         | 0.3803 | 0.4886 | 0.8732   | 0.8258    |
 | <sub>mAP(%)(medium)</sub>       | 0.3475 | 0.5292 | 0.8732   | 0.8258    |
 | <sub>mAP(%)(fast)</sub>         | 0.2439 | 0.4097 | 0.6341   | 0.4839    |
-| <sub>mAP(%)(all motion)</sub>   | 0.2367 | 0.4858 | 0.8340   | '0.7293'  |
+| <sub>mAP(%)(all motion)</sub>   | 0.2367 | 0.4858 | 0.8340   |**0.7293** |
 
 *Detection accuracy of small (area < 50^2 pixels), medium (50^2 ≤ area ≤ 150^2 pixels), and large (area > 150^2 pixels) object instances with respect to slow (motion iou < 0.7), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou > 0.9) object instances.
 *The last row is the accuracy of object instances with different areas without considering instance motions, and the last column is the accuracy of object instances with different motions without considering instance areas.

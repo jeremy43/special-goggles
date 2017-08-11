@@ -6,7 +6,7 @@ The major contributors of this repository include [Xizhou Zhu](https://github.co
 ## Introduction
 
 
-**Flow-Guided Feature Aggregation** is initially described in a [CVPR 2017 paper](https://arxiv.org/abs/1611.07715). It provides an accurate and end-to-end framework for video recognition (e.g., object detection and semantic segmentation in videos). It is worth noting that:
+**Flow-Guided Feature Aggregation** is initially described in a [CVPR 2017 paper](https://arxiv.org/abs/1703.10025). It provides an accurate and end-to-end framework for video recognition (e.g., object detection and semantic segmentation in videos). It is worth noting that:
 
 * Flow-Guided Feature Aggregation significantly improves the video recognition accuracy by applying the heavy-weight image recognition network (e.g., ResNet-101) on an interval of frames, and aggregating nearby features along the motion paths to produce a more accurate prediction with the leverage of temporal coherence on feature level.
 * The entire system is end-to-end trained for the task of video recognition, which is vital for improving the recognition accuracy. Directly adopting state-of-the-art flow estimation methods without end-to-end training would deliver noticable worse results.
@@ -18,7 +18,7 @@ The major contributors of this repository include [Xizhou Zhu](https://github.co
 
 ## Disclaimer
 
-This is an official implementation for [Flow-Guided Feature Aggregation for Video Recognition](https://arxiv.org/abs/1611.07715) (FGFA) based on MXNet. It is worth noticing that:
+This is an official implementation for [Flow-Guided Feature Aggregation for Video Recognition](https://arxiv.org/abs/1703.10025) (FGFA) based on MXNet. It is worth noticing that:
 
   * The original implementation is based on our internal Caffe version on Windows. There are slight differences in the final accuracy and running time due to the plenty details in platform switch.
   * The code is tested on official [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60) with the extra operators for Deep Feature Flow.

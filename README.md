@@ -36,7 +36,7 @@ This is an official implementation for [Flow-Guided Feature Aggregation for Vide
 
 If you find Flow-Guided Feature Aggregation useful in your research, please consider citing:
 ```
-@inproceedings{zhu17dff,
+@inproceedings{zhu17fgfa,
     Author = {Xizhou Zhu, Yuwen Xiong, Yuqing Zhu, Shuhao Fu, Jifeng Dai, Lu Yuan, Yichen Wei},
     Title = {Flow-Guided Feature Aggregation for Video Object Detection},
     Conference = {CVPR},

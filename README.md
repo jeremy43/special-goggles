@@ -21,7 +21,7 @@ The major contributors of this repository include [Xizhou Zhu](https://github.co
 This is an official implementation for [Flow-Guided Feature Aggregation for Video Recognition](https://arxiv.org/abs/1703.10025) (FGFA) based on MXNet. It is worth noticing that:
 
   * The original implementation is based on our internal Caffe version on Windows. There are slight differences in the final accuracy and running time due to the plenty details in platform switch.
-  * The code is tested on official [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60) with the extra operators for Deep Feature Flow.
+  * The code is tested on official [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60) with the extra operators for Flow-guided Feature Aggregation.
   * We trained our model based on the ImageNet pre-trained [ResNet-v1-101](https://github.com/KaimingHe/deep-residual-networks) model and [Flying Chairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html) pre-trained [FlowNet](https://lmb.informatik.uni-freiburg.de/resources/binaries/dispflownet/dispflownet-release-1.2.tar.gz) model using a [model converter](https://github.com/dmlc/mxnet/tree/430ea7bfbbda67d993996d81c7fd44d3a20ef846/tools/caffe_converter). The converted [ResNet-v1-101](https://github.com/KaimingHe/deep-residual-networks) model produces slightly lower accuracy (Top-1 Error on ImageNet val: 24.0% v.s. 23.6%).
   * This repository used code from [MXNet rcnn example](https://github.com/dmlc/mxnet/tree/master/example/rcnn) and [mx-rfcn](https://github.com/giorking/mx-rfcn).
   * To install the MXNet version for this model, please refer to [this repo](https://github.com/daijifeng001/mxnet).
@@ -74,9 +74,9 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 | <sub>mAP(%)(fast)</sub>         | 0.2439 | 0.4097 | 0.6341   | 0.4839    |
 | <sub>mAP(%)(all motion)</sub>   | 0.2367 | 0.4858 | 0.8340   |**0.7293** |
 
-*Detection accuracy of small (area < 50^2 pixels), medium (50^2 ≤ area ≤ 150^2 pixels), and large (area > 150^2 pixels) object instances with respect to slow (motion iou < 0.7), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou > 0.9) object instances.
-*The last row is the accuracy of object instances with different areas without considering instance motions, and the last column is the accuracy of object instances with different motions without considering instance areas.
-*The last cell is the mAP of all object instances.
+*Detection accuracy of small (area < 50^2 pixels), medium (50^2 ≤ area ≤ 150^2 pixels), and large (area > 150^2 pixels) object instances with respect to slow (motion iou < 0.7), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou > 0.9) object instances.*
+*The last row is the accuracy of object instances with different areas without considering instance motions, and the last column is the accuracy of object instances with different motions without considering instance areas.*
+*The last cell is the mAP of all object instances.*
 
 
 ## Requirements: Software
@@ -165,9 +165,8 @@ git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
 
 Code has been tested under:
 
-- Ubuntu 14.04 with a Maxwell Titan X GPU and Intel Xeon CPU E5-2620 v2 @ 2.10GHz
-- Windows Server 2012 R2 with 8 K40 GPUs and Intel Xeon CPU E5-2650 v2 @ 2.60GHz
-- Windows Server 2012 R2 with 4 Pascal Titan X GPUs and Intel Xeon CPU E5-2650 v4 @ 2.30GHz
+- Windows Server 2012 R2 with 4 K40 GPUs and Intel Xeon CPU E5-2650 v2 @ 2.60GHz
+- Windows Server 2012 R2 with 2 Pascal Titan X GPUs and Intel Xeon CPU E5-2670 v2 @ 2.50GHz
 
 ## FAQ
 

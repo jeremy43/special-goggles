@@ -1,4 +1,4 @@
-# Flow-Guided-Feature-Aggregation for Video Recognition
+# Flow-Guided-Feature-Aggregation for Video Object Detection
 
 
 The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yuqing Zhu](), [Shuhao Fu](https://github.com/howardmumu), [Yujie Wang](), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
@@ -67,13 +67,23 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 
 ## Detailed Evaluation Results
 
+### Single-frame Baseline
 
 |                                 | <sub>small</sub>     | <sub>middle</sub> | <sub>large</sub> | <sub>all areas</sub> |
 |---------------------------------|----------------------|-------------------|------------------|---------------------|
-| <sub>mAP(%)(slow)</sub>         | 0.3803 | 0.4886 | 0.8732   | 0.8258    |
-| <sub>mAP(%)(medium)</sub>       | 0.3475 | 0.5292 | 0.8732   | 0.8258    |
-| <sub>mAP(%)(fast)</sub>         | 0.2439 | 0.4097 | 0.6341   | 0.4839    |
-| <sub>mAP(%)</sub>               | 0.2367 | 0.4858 | 0.8340   |**0.7293** |
+| <sub>mAP(%)(slow)</sub>         |  |  |  |  |
+| <sub>mAP(%)(medium)</sub>       |  |  |  |  |
+| <sub>mAP(%)(fast)</sub>         |  |  |  |  |
+| <sub>mAP(%)</sub>               |  |  |  |  |
+
+### Flow-Guided Feature Aggregation
+
+|                                 | <sub>small</sub>     | <sub>middle</sub> | <sub>large</sub> | <sub>all areas</sub> |
+|---------------------------------|----------------------|-------------------|------------------|---------------------|
+| <sub>mAP(%)(slow)</sub>         |  |  |  |  |
+| <sub>mAP(%)(medium)</sub>       |  |  |  |  |
+| <sub>mAP(%)(fast)</sub>         |  |  |  |  |
+| <sub>mAP(%)</sub>               |  |  |  |  |
 
 *Detection accuracy of small (area < $50^2$ pixels), medium ($50^2$ ≤ area ≤ $150^2$ pixels), and large (area > $150^2$ pixels) object instances with respect to slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*
 
@@ -101,13 +111,38 @@ Any NVIDIA GPUs with at least 8GB memory should be OK
 
 ## Installation
 
-1. Clone the Flow-Guided Feature Aggregation repository
+1. Clone the Flow-Guided Feature Aggregation repository, and we'll call the directory that you cloned Flow-Guided-Feature-Aggregation as ${FGFA_ROOT}. 
+
 ~~~
 git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
 ~~~
 2. For Windows users, run ``cmd .\init.bat``. For Linux user, run `sh ./init.sh`. The scripts will build cython module automatically and create some folders.
-3. Copy operators in `./fgfa_rfcn/operator_cxx` to `$(YOUR_MXNET_FOLDER)/src/operator/contrib` and recompile MXNet.
-4. Please install MXNet following the official guide of MXNet. For advanced users, you may put your Python packge into `./external/mxnet/$(YOUR_MXNET_PACKAGE)`, and modify `MXNET_VERSION` in `./experiments/fgfa_rfcn/cfgs/*.yaml` to `$(YOUR_MXNET_PACKAGE)`. Thus you can switch among different versions of MXNet quickly.
+
+3. Install MXNet:
+
+	3.1 Clone MXNet and checkout to [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60) by
+	```
+	git clone --recursive https://github.com/dmlc/mxnet.git
+	git checkout 62ecb60
+	git submodule update
+	```
+	3.2 Copy operators in `$(FGFA_ROOT)/fgfa_rfcn/operator_cxx` to `$(YOUR_MXNET_FOLDER)/src/operator/contrib` by
+	```
+	cp -r $(FGFA_ROOT)/fgfa_rfcn/operator_cxx/* $(MXNET_ROOT)/src/operator/contrib/
+	```
+	3.3 Compile MXNet
+	```
+	cd ${MXNET_ROOT}
+	make -j4
+	```
+	3.4 Install the MXNet Python binding by
+	
+	***Note: If you will actively switch between different versions of MXNet, please follow 3.5 instead of 3.4***
+	```
+	cd python
+	sudo python setup.py install
+	```
+	3.5 For advanced users, you may put your Python packge into `./external/mxnet/$(YOUR_MXNET_PACKAGE)`, and modify `MXNET_VERSION` in `./experiments/fgfa_rfcn/cfgs/*.yaml` to `$(YOUR_MXNET_PACKAGE)`. Thus you can switch among different versions of MXNet quickly.
 
 
 ## Demo
@@ -165,18 +200,6 @@ Code has been tested under:
 - Windows Server 2012 R2 with 2 Pascal Titan X GPUs and Intel Xeon CPU E5-2670 v2 @ 2.50GHz
 
 ## FAQ
-
-Q: It says `AttributeError: 'module' object has no attribute 'MultiProposal'`.
-
-A: This is because either
- - you forget to copy the operators to your MXNet folder
- - or you copy to the wrong path
- - or you forget to re-compile and install
- - or you install the wrong MXNet
-
-    Please print `mxnet.__path__` to make sure you use correct MXNet
-
-<br/><br/>
 Q: I encounter `segment fault` at the beginning.
 
 A: A compatibility issue has been identified between MXNet and opencv-python 3.0+. We suggest that you always `import cv2` first before `import mxnet` in the entry script. 

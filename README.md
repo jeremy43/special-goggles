@@ -1,7 +1,7 @@
 # Flow-Guided-Feature-Aggregation for Video Recognition
 
 
-The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yujie Wang](), [Yuqing Zhu](), [Shuhao Fu](https://github.com/howardmumu), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
+The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yuqing Zhu](), [Shuhao Fu](https://github.com/howardmumu), [Yujie Wang](), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
 
 ## Introduction
 

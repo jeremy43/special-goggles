@@ -58,7 +58,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 |                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP@0.5</sub> | <sub>time/image</br> (Tesla K40)</sub> | <sub>time/image</br>(Maxwell Titan X)</sub> |
 |---------------------------------|-------------------|--------------|---------|---------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>                    | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1    | 0.271s    | 0.133s |
-| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   1.0258s  | 0.557s |
+| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   0.762s  | 0.557s |
 | <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  78.9   |     |  |
 
 *Running time is counted on a single GPU (mini-batch size is 1 in inference).*

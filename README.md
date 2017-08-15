@@ -58,7 +58,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 |                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP@0.5</sub> | <sub>time/image</br> (Tesla K40)</sub> | <sub>time/image</br>(Maxwell Titan X)</sub> |
 |---------------------------------|-------------------|--------------|---------|---------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>                    | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1    | 0.271s    | 0.133s |
-| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.13   |   1.0258s  | 0.557s |
+| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   1.0258s  | 0.557s |
 | <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |     |     |  |
 
 *Running time is counted on a single GPU (mini-batch size is 1 in inference).*
@@ -67,29 +67,16 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 
 ## Detailed Evaluation Results
 
-### Single-frame Baseline
-
-|                                 | <sub>small</sub>     | <sub>middle</sub> | <sub>large</sub> | <sub>all areas</sub> 	|
+|  instance motion | <sub>mAP(%)(slow)</sub>  | <sub>mAP(%)(medium)</sub> | <sub>mAP(%)(fast)</sub>  |  <sub>all motions</sub>|
 |---------------------------------|----------------------|-------------------|------------------|-----------------------|
-| <sub>mAP(%)(slow)</sub>         |	 0.331		 |	0.470	     |	0.888		|	0.836		|
-| <sub>mAP(%)(medium)</sub>       |	 0.388		 |	0.510	     |	0.812		|	0.716		|
-| <sub>mAP(%)(fast)</sub>         | 	 0.265		 |	0.449	     |	0.683 		|	0.512		|
-| <sub>mAP(%)</sub>               | 	 0.266	 	 |  	0.500 	     |  0.848		| 	0.741 		|
+| <sub>single-frame baseline</sub>|	 0.836		 |	0.716	     |	0.512		|	0.741		|
+| <sub>FGFA</sub>       	  |	 0.859		 |	0.757	     |  0.561		|	0.771		|
+| <sub>FGFA+SeqNMS</sub>          | 	 		 |		     |	 		|			|
 
-### Flow-Guided Feature Aggregation
 
-|                                 | <sub>small</sub>     | <sub>middle</sub> | <sub>large</sub> | <sub>all areas</sub> 	|
-|---------------------------------|----------------------|-------------------|------------------|-----------------------|
-| <sub>mAP(%)(slow)</sub>         |	0.366		 |	0.522	     |	0.911	 	|	0.859		|
-| <sub>mAP(%)(medium)</sub>       | 	0.381		 |	0.551	     |	0.856 		|  	0.757		|
-| <sub>mAP(%)(fast)</sub>         | 	0.295		 |	0.480	     |	0.731 		|  	0.561		|
-| <sub>mAP(%)</sub>               | 	0.264 		 | 	0.529        |  0.873	  	| 	0.771 		|
+*Detection accuracy of slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*
 
-*Detection accuracy of small (area < 50 <sup>2</sup> pixels), medium (50 <sup>2</sup> ≤ area ≤ 150 <sup>2</sup> pixels), and large (area > 150 <sup>2</sup> pixels) object instances with respect to slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*
-
-*The last row is the accuracy of object instances with different areas without considering instance motions, and the last column is the accuracy of object instances with different motions without considering instance areas.*
-
-*The last cell is the mAP of all object instances.*
+*The last column is the mAP of all object instances.*
 
 
 ## Requirements: Software

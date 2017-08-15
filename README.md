@@ -59,7 +59,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 |---------------------------------|-------------------|--------------|---------|---------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>                    | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1    | 0.271s    | 0.133s |
 | <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   1.0258s  | 0.557s |
-| <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |     |     |  |
+| <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  78.9   |     |  |
 
 *Running time is counted on a single GPU (mini-batch size is 1 in inference).*
 
@@ -71,7 +71,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 |---------------------------------|----------------------|-------------------|------------------|-----------------------|
 | <sub>single-frame baseline</sub>|	 0.836		 |	0.716	     |	0.512		|	0.741		|
 | <sub>FGFA</sub>       	  |	 0.859		 |	0.757	     |  0.561		|	0.771		|
-| <sub>FGFA+SeqNMS</sub>          | 	 		 |		     |	 		|			|
+| <sub>FGFA+SeqNMS</sub>          | 	 0.868		 |	0.779	     |	0.579 		|	0.789		|
 
 
 *Detection accuracy of slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*

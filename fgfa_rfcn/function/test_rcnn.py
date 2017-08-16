@@ -40,7 +40,7 @@ def get_predictor(sym, sym_instance, cfg, arg_params, aux_params, test_data, ctx
                           arg_params=arg_params, aux_params=aux_params)
     return predictor
 
-def test_rcnn(cfg, dataset, image_set, root_path, dataset_path,
+def test_rcnn(cfg, dataset, image_set, root_path, dataset_path, motion_iou_path,
               ctx, prefix, epoch,
               vis, ignore_cache, shuffle, has_rpn, proposal, thresh, logger=None, output_path=None):
     if not logger:
@@ -58,7 +58,7 @@ def test_rcnn(cfg, dataset, image_set, root_path, dataset_path,
     feat_sym = feat_sym_instance.get_feat_symbol(cfg)
     aggr_sym = aggr_sym_instance.get_aggregation_symbol(cfg)
 
-    imdb = eval(dataset)(image_set, root_path, dataset_path, result_path=output_path)
+    imdb = eval(dataset)(image_set, root_path, dataset_path, motion_iou_path, result_path=output_path)
     roidb = imdb.gt_roidb()
 
     # get test data iter

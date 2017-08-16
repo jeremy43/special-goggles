@@ -49,6 +49,7 @@ config.dataset.image_set = 'DET_train_30classes+VID_train_15frames'
 config.dataset.test_image_set = 'VID_val_videos'
 config.dataset.root_path = './data'
 config.dataset.dataset_path = './data/ILSVRC2015'
+config.dataset.motion_iou_path = './lib/dataset/groundtruth_motion_iou.mat'
 config.dataset.NUM_CLASSES = 31
 
 

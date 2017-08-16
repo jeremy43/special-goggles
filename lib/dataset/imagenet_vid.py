@@ -25,16 +25,17 @@ from ds_utils import unique_boxes, filter_small_boxes
 
 
 class ImageNetVID(IMDB):
-    def __init__(self, image_set, root_path, dataset_path, result_path=None, enable_detailed_eval=True):
+    def __init__(self, image_set, root_path, dataset_path, motion_iou_path, result_path=None, enable_detailed_eval=True):
         """
         fill basic information to initialize imdb
         """
         det_vid = image_set.split('_')[0]
-        super(ImageNetVID, self).__init__('ImageNetVID', image_set, root_path, dataset_path, result_path, enable_detailed_eval)  # set self.name
+        super(ImageNetVID, self).__init__('ImageNetVID', image_set, root_path, dataset_path, result_path)  # set self.name
 
         self.det_vid = det_vid
         self.root_path = root_path
         self.data_path = dataset_path
+        self.motion_iou_path = motion_iou_path
         self.enable_detailed_eval = enable_detailed_eval
 
         self.classes = ['__background__',  # always index 0
@@ -299,7 +300,6 @@ class ImageNetVID(IMDB):
         annopath = os.path.join(self.data_path, 'Annotations', '{0!s}.xml')
         imageset_file = os.path.join(self.data_path, 'ImageSets', self.image_set + '_eval.txt')
         annocache = os.path.join(self.cache_path, self.name + '_annotations.pkl')
-        motion_iou_file = './lib/dataset/groundtruth_motion_iou.mat'
 
         with open(imageset_file, 'w') as f:
             for i in range(len(self.pattern)):
@@ -323,7 +323,7 @@ class ImageNetVID(IMDB):
 
             if len(motion_ranges) > 1 or len(area_ranges) > 1:
                 part_ap, motion_ap, area_ap = vid_eval_motion(filename, annopath, imageset_file, self.classes_map, annocache,
-                                                          motion_iou_file, motion_ranges, area_ranges, ovthresh=0.5)
+                                                          self.motion_iou_path, motion_ranges, area_ranges, ovthresh=0.5)
                 if len(motion_ranges) > 1:
                     for motion_range_id, motion_range in enumerate(motion_ranges):
                         print '================================================='

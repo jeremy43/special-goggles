@@ -55,7 +55,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 
 
 |                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP(%)</sub> | <sub>mAP(%)(slow)</sub>  | <sub>mAP(%)(medium)</sub> | <sub>mAP(%)(fast)</sub> |
-|---------------------------------|-------------------|--------------|---------|---------|--------|
+|---------------------------------|-------------------|--------------|---------|---------|--------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>   | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1 | 83.6 | 71.6 | 51.2 |
 | <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 77.1 | 85.9 | 75.7 | 56.1 |
 | <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>  | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 78.9 | 86.8 | 77.9 | 57.9 |

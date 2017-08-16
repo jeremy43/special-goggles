@@ -54,27 +54,15 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 ## Main Results
 
 
-|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP@0.5</sub> | <sub>time/image</br> (Tesla K40)</sub> | <sub>time/image</br>(Maxwell Titan X)</sub> |
+|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP(%)</sub> | <sub>mAP(%)(slow)</sub>  | <sub>mAP(%)(medium)</sub> | <sub>mAP(%)(fast)</sub> |
 |---------------------------------|-------------------|--------------|---------|---------|--------|
-| <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>                    | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1    | 0.271s    | 0.133s |
-| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   0.721s  |  |
-| <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  78.9   |     |  |
-
-*Running time is counted on a single GPU (mini-batch size is 1 in inference).*
-
-*Single-frame baseline results are from [Deep-Feature-Flow](https://github.com/msracver/Deep-Feature-Flow).*
-
-## Detailed Evaluation Results
-
-|  instance motion | <sub>mAP(%)(slow)</sub>  | <sub>mAP(%)(medium)</sub> | <sub>mAP(%)(fast)</sub>  |  <sub>mAP(%)</sub>|
-|---------------------------------|----------------------|-------------------|------------------|-----------------------|
-| <sub>single-frame baseline</sub>|	 0.836		 |	0.716	     |	0.512		|	0.741		|
-| <sub>FGFA</sub>       	  |	 0.859		 |	0.757	     |  0.561		|	0.771		|
-| <sub>FGFA+SeqNMS</sub>          | 	 0.868		 |	0.779	     |	0.579 		|	0.789		|
-
+| <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>   | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1 | 83.6 | 71.6 | 51.2 |
+| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 77.1 | 85.9 | 75.7 | 56.1 |
+| <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>  | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 78.9 | 86.8 | 77.9 | 57.9 |
 
 *Detection accuracy of slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*
 
+*Single-frame baseline model is from [Deep-Feature-Flow](https://github.com/msracver/Deep-Feature-Flow).*
 
 ## Requirements: Software
 

@@ -1,7 +1,7 @@
 # Flow-Guided-Feature-Aggregation for Video Object Detection
 
 
-The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yuqing Zhu](), [Shuhao Fu](https://github.com/howardmumu), [Yujie Wang](), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
+The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yuqing Zhu](141160088@smail.nju.edu.cn), [Shuhao Fu](https://github.com/howardmumu), [Yujie Wang](), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
 
 ## Introduction
 

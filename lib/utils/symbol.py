@@ -30,7 +30,6 @@ class Symbol:
         fan_in = float(shape[1])
         if len(shape) > 2:
             fan_in *= np.prod(shape[2:])
-        print(np.sqrt(2 / fan_in))
         return np.sqrt(2 / fan_in)
 
     def infer_shape(self, data_shape_dict):

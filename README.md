@@ -8,9 +8,8 @@ The major contributors of this repository include [Yuqing Zhu](mailto:141160088@
 
 **Flow-Guided Feature Aggregation** is initially described in a [ICCV 2017 paper](https://arxiv.org/abs/1703.10025). It provides an accurate and end-to-end learning framework for video object detection. It is worth noting that:
 
-* Flow-Guided Feature Aggregation improves the per-frame features by aggregation of nearby features along the motion paths, thus significantly improves the video object detection accuracy.
-* Flow-Guided Feature Aggregation considers temporal information at the feature level instead of the ﬁnal box level. The entire system is end-to-end trained for the task of video recognition, which is vital for improving the recognition accuracy.
-* Flow-Guided Feature Aggregation signiﬁcantly improves upon strong single-frame baselines in ImageNet VID, especially for more challenging fast moving objects
+* Flow-Guided Feature Aggregation improves the per-frame features by aggregation of nearby features along the motion paths, thus significantly improves the video object detection accuracy, especially for more challenging fast moving objects.
+* The entire system is end-to-end trained for the task of video recognition, which is vital for improving the recognition accuracy.
 
 ***Click image to watch our demo video***
 
@@ -54,13 +53,15 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 ## Main Results
 
 
-|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP(%)</sub> | <sub>mAP(%)</br>(slow)</sub>  | <sub>mAP(%)</br>(medium)</sub> | <sub>mAP(%)</br>(fast)</sub> |
+|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP(%)</sub> | <sub>mAP(%)</br>(slow)</sub>  | <sub>mAP(%)</br>(medium)</sub> | <sub>mAP(%)</br>(fast)</sub> |
 |---------------------------------|-------------------|--------------|---------|---------|--------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>   | <sub>ImageNet DET train</br> + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1 | 83.6 | 71.6 | 51.2 |
 | <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train</br> + VID train</sub> | <sub>ImageNet VID validation</sub> | 77.1 | 85.9 | 75.7 | 56.1 |
 | <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>  | <sub>ImageNet DET train</br> + VID train</sub> | <sub>ImageNet VID validation</sub> | 78.9 | 86.8 | 77.9 | 57.9 |
 
-*Detection accuracy of slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*
+**[Motion-specific evaluation code](lib/dataset/imagenet_vid_eval_motion.py) for video object detection is included in this repository. The original object detection evaluation disregards object motion, which is insufficient for video object detection analysis.**
+
+*Detection accuracy of slow (motion IoU > 0.9), medium (0.7 ≤ motion IoU ≤ 0.9), and fast (motion IoU < 0.7) moving object instances.*
 
 *Single-frame baseline model is from [Deep-Feature-Flow](https://github.com/msracver/Deep-Feature-Flow).*
 

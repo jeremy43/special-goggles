@@ -75,8 +75,6 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 
 *Detection accuracy of slow (motion iou > 0.9), medium (0.7 ≤ motion iou ≤ 0.9), and fast (motion iou < 0.7) moving object instances.*
 
-*The last column is the mAP of all object instances.*
-
 
 ## Requirements: Software
 

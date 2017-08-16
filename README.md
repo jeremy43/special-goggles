@@ -1,7 +1,7 @@
 # Flow-Guided-Feature-Aggregation for Video Object Detection
 
 
-The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yuqing Zhu](141160088@smail.nju.edu.cn), [Shuhao Fu](https://github.com/howardmumu), [Yujie Wang](), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
+The major contributors of this repository include [Xizhou Zhu](https://github.com/einsiedler0408), [Yuqing Zhu](mailto:141160088@smail.nju.edu.cn), [Shuhao Fu](https://github.com/howardmumu), [Yujie Wang](), [Jifeng Dai](https://github.com/daijifeng001), [Lu Yuan](http://www.lyuan.org/), and  [Yichen Wei](https://github.com/YichenWei).
 
 ## Introduction
 
@@ -21,11 +21,10 @@ The major contributors of this repository include [Xizhou Zhu](https://github.co
 This is an official implementation for [Flow-Guided Feature Aggregation for Video Recognition](https://arxiv.org/abs/1703.10025) (FGFA) based on MXNet. It is worth noticing that:
 
   * The original implementation is based on our internal Caffe version on Windows. There are slight differences in the final accuracy and running time due to the plenty details in platform switch.
-  * The code is tested on official [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60) with the extra operators for Flow-guided Feature Aggregation.
+  * This repository performs one-phase training on the mixture dataset of ImageNet DET+VID, instead of two-phase training (first trained on ImageNet DET, then trained on ImageNet VID) which is performed in the original paper.
+  * The code is tested on official [MXNet@(v0.10.0)](https://github.com/apache/incubator-mxnet/tree/v0.10.0) with the extra operators for Flow-guided Feature Aggregation.
   * We trained our model based on the ImageNet pre-trained [ResNet-v1-101](https://github.com/KaimingHe/deep-residual-networks) model and [Flying Chairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html) pre-trained [FlowNet](https://lmb.informatik.uni-freiburg.de/resources/binaries/dispflownet/dispflownet-release-1.2.tar.gz) model using a [model converter](https://github.com/dmlc/mxnet/tree/430ea7bfbbda67d993996d81c7fd44d3a20ef846/tools/caffe_converter). The converted [ResNet-v1-101](https://github.com/KaimingHe/deep-residual-networks) model produces slightly lower accuracy (Top-1 Error on ImageNet val: 24.0% v.s. 23.6%).
-  * This repository used code from [MXNet rcnn example](https://github.com/dmlc/mxnet/tree/master/example/rcnn) and [mx-rfcn](https://github.com/giorking/mx-rfcn).
-  * To install the MXNet version for this model, please refer to [this repo](https://github.com/daijifeng001/mxnet).
-
+  * This repository used code from [MXNet rcnn example](https://github.com/apache/incubator-mxnet/tree/master/example/rcnn) and [mx-rfcn](https://github.com/giorking/mx-rfcn).
 
 
 
@@ -58,16 +57,16 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 |                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP@0.5</sub> | <sub>time/image</br> (Tesla K40)</sub> | <sub>time/image</br>(Maxwell Titan X)</sub> |
 |---------------------------------|-------------------|--------------|---------|---------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>                    | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1    | 0.271s    | 0.133s |
-| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   0.762s  | 0.557s |
+| <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  77.1   |   0.721s  |  |
 | <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train + VID train</sub> | <sub>ImageNet VID validation</sub> |  78.9   |     |  |
 
 *Running time is counted on a single GPU (mini-batch size is 1 in inference).*
 
-*The runtime of the light-weight FlowNet seems to be a bit slower on MXNet than that on Caffe.*
+*Single-frame baseline results are from [Deep-Feature-Flow](https://github.com/msracver/Deep-Feature-Flow).*
 
 ## Detailed Evaluation Results
 
-|  instance motion | <sub>mAP(%)(slow)</sub>  | <sub>mAP(%)(medium)</sub> | <sub>mAP(%)(fast)</sub>  |  <sub>all motions</sub>|
+|  instance motion | <sub>mAP(%)(slow)</sub>  | <sub>mAP(%)(medium)</sub> | <sub>mAP(%)(fast)</sub>  |  <sub>mAP(%)</sub>|
 |---------------------------------|----------------------|-------------------|------------------|-----------------------|
 | <sub>single-frame baseline</sub>|	 0.836		 |	0.716	     |	0.512		|	0.741		|
 | <sub>FGFA</sub>       	  |	 0.859		 |	0.757	     |  0.561		|	0.771		|
@@ -81,7 +80,7 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 
 ## Requirements: Software
 
-1. MXNet from [the offical repository](https://github.com/dmlc/mxnet). We tested our code on [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60). Due to the rapid development of MXNet, it is recommended to checkout this version if you encounter any issues. We may maintain this repository periodically if MXNet adds important feature in future release.
+1. MXNet from [the offical repository](https://github.com/apache/incubator-mxnet). We tested our code on [MXNet@(v0.10.0)](https://github.com/apache/incubator-mxnet/tree/v0.10.0). Due to the rapid development of MXNet, it is recommended to checkout this version if you encounter any issues. We may maintain this repository periodically if MXNet adds important feature in future release.
 
 2. Python packages might missing: cython, opencv-python >= 3.2.0, easydict. If `pip` is set up on your system, those packages should be able to be fetched and installed by running
 	```
@@ -107,10 +106,11 @@ git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
 
 3. Install MXNet:
 
-	3.1 Clone MXNet and checkout to [MXNet@(commit 62ecb60)](https://github.com/dmlc/mxnet/tree/62ecb60) by
+	3.1 Clone MXNet and checkout to [MXNet@(v0.10.0)](https://github.com/apache/incubator-mxnet/tree/v0.10.0) by
 	```
-	git clone --recursive https://github.com/dmlc/mxnet.git
-	git checkout 62ecb60
+	git clone --recursive https://github.com/apache/incubator-mxnet.git
+	cd incubator-mxnet
+	git checkout v0.10.0
 	git submodule update
 	```
 	3.2 Copy operators in `$(FGFA_ROOT)/fgfa_rfcn/operator_cxx` to `$(YOUR_MXNET_FOLDER)/src/operator/contrib` by
@@ -135,7 +135,7 @@ git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
 ## Demo
 
 
-1. To run the demo with our trained model (on ImageNet DET + VID train), please download the model manually from [OneDrive](https://1drv.ms/u/s!Am-5JzdW2XHzhqMPLjGGCvAeciQflg), and put it under folder `model/`.
+1. To run the demo with our trained model (on ImageNet DET + VID train), please download the model manually from [OneDrive](), and put it under folder `model/`.
 
 	Make sure it looks like this:
 	```

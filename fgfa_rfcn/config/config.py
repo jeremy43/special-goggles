@@ -1,9 +1,9 @@
 # --------------------------------------------------------
-#Flow-Guided-Feature-Aggregation
+# Flow-Guided Feature Aggregation
 # Copyright (c) 2016 by Contributors
 # Copyright (c) 2017 Microsoft
 # Licensed under The Apache-2.0 License [see LICENSE for details]
-# Modified by Xizhou Zhu, Yuwen Xiong, Bin Xiao, Yuqing Zhu, Shuhao Fu
+# Modified by Yuqing Zhu, Shuhao Fu, Xizhou Zhu, Yuwen Xiong, Bin Xiao
 # --------------------------------------------------------
 
 import yaml

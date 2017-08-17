@@ -1,8 +1,8 @@
 # --------------------------------------------------------
-# #Flow-Guided-Feature-Aggregation
+# Flow-Guided Feature Aggregation
 # Copyright (c) 2017 Microsoft
 # Licensed under The Apache-2.0 License [see LICENSE for details]
-# Written by Xizhou Zhu, Yi Li, Haochen Zhang, Yuqing Zhu, Shuhao Fu
+# Written by Yuqing Zhu, Shuhao Fu, Xizhou Zhu, Yi Li, Haochen Zhang
 # --------------------------------------------------------
 
 import _init_paths
@@ -35,8 +35,10 @@ sys.path.insert(0, os.path.join(cur_path, '../external/mxnet/', cfg.MXNET_VERSIO
 import mxnet as mx
 import time
 from core.tester import im_detect, Predictor, get_resnet_output, prepare_data, draw_all_detection
+from symbols import *
 from nms.seq_nms import seq_nms
 from utils.load_model import load_param
+from utils.tictoc import tic, toc
 from nms.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
 
 def parse_args():
@@ -109,7 +111,8 @@ def main():
                'whale', 'zebra']
 
     # load demo data
-    image_names = glob.glob(cur_path + '/../demo/ILSVRC2015_val_00009000/*.JPEG')
+
+    image_names = glob.glob(cur_path + '/../demo/ILSVRC2015_val_00007010/*.JPEG')
     output_dir = cur_path + '/../demo/rfcn_fgfa/'
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
@@ -164,7 +167,7 @@ def main():
                                  provide_data=[[(k, v.shape) for k, v in zip(data_names, data[idx])]],
                                  provide_label=[None])
     scales = [data_batch.data[i][1].asnumpy()[0, 2] for i in xrange(len(data_batch.data))]
-    data = data[0:20]
+    # data = data[0:20]
     all_boxes = [[[] for _ in range(len(data))]
                  for _ in range(num_classes)]
     data_list = deque(maxlen=all_frame_interval)
@@ -213,7 +216,7 @@ def main():
                 total_time = time.time()-t1
                 if (cfg.TEST.SEQ_NMS==False):
                     save_image(output_dir, file_idx, out_im)
-                print 'testing {} {:.4f}s'.format(str(file_idx)+'.JPEG', total_time / file_idx)
+                print 'testing {} {:.4f}s'.format(str(file_idx)+'.JPEG', total_time /(file_idx+1))
                 file_idx += 1
         else:
             #################################################
@@ -234,7 +237,7 @@ def main():
                 total_time = time.time() - t1
                 if (cfg.TEST.SEQ_NMS == False):
                     save_image(output_dir, file_idx, out_im)
-                print 'testing {} {:.4f}s'.format(str(file_idx)+'.JPEG', total_time / file_idx)
+                print 'testing {} {:.4f}s'.format(str(file_idx)+'.JPEG', total_time / (file_idx+1))
                 file_idx += 1
                 end_counter+=1
 

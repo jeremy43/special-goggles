@@ -1,18 +1,20 @@
 # --------------------------------------------------------
-# #Flow-Guided-Feature-Aggregation
+# Flow-Guided Feature Aggregation
 # Copyright (c) 2017 Microsoft
 # Licensed under The Apache-2.0 License [see LICENSE for details]
-# Written by Yuwen Xiong, Xizhou Zhu, Yuqing Zhu, Shuhao Fu
+# Written by Yuqing Zhu, Shuhao Fu, Yuwen Xiong, Xizhou Zhu
 # --------------------------------------------------------
 
 import cPickle
 import mxnet as mx
+
 from utils.symbol import Symbol
 from operator_py.proposal import *
 from operator_py.proposal_target import *
 from operator_py.box_annotator_ohem import *
 from operator_py.rpn_inv_normalize import *
 from operator_py.tile_as import *
+
 
 
 class resnet_v1_101_flownet_rfcn(Symbol):

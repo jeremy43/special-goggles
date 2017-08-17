@@ -2,7 +2,7 @@
 # Flow-guided Feature Aggregation
 # Copyright (c) 2017 Microsoft
 # Licensed under The Apache-2.0 License [see LICENSE for details]
-# Written by Xizhou Zhu, Shuhao Fu
+# Written by Shuhao Fu, Xizhou Zhu
 # --------------------------------------------------------
 
 """

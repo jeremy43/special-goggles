@@ -423,7 +423,6 @@ def pred_eval_multiprocess(gpu_num, key_predictors, cur_predictors, test_datas, 
             res = [res.get() for res in multiple_results]
 
 
-        print 'finish reading cache for seqnms'
         from multiprocessing import Pool as Pool
         pool = Pool(processes=gpu_num)
         jobs = []

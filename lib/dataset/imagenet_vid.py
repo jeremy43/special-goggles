@@ -22,6 +22,7 @@ from imdb import IMDB
 from imagenet_vid_eval import vid_eval
 from imagenet_vid_eval_motion import vid_eval_motion
 from ds_utils import unique_boxes, filter_small_boxes
+from nms.seq_nms import seq_nms
 from nms.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
 
 
@@ -255,7 +256,7 @@ class ImageNetVID(IMDB):
         :param all_boxes: boxes to be processed [bbox, confidence]
         :return: None
         """
-        print 'here'
+
         print 'Writing {} ImageNetVID results file'.format('all')
         filename = self.get_result_file_template(gpu_id).format('all')
         frame_seg_len = self.frame_seg_len

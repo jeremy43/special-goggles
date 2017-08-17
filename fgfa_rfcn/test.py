@@ -27,7 +27,7 @@ def parse_args():
     # rcnn
     parser.add_argument('--vis', help='turn on visualization', action='store_true')
     parser.add_argument('--ignore_cache', help='ignore cached results boxes', action='store_true')
-    parser.add_argument('--thresh', help='valid detection threshold', default=1e-4, type=float)
+    parser.add_argument('--thresh', help='valid detection threshold', default=1e-3, type=float)
     parser.add_argument('--shuffle', help='shuffle data on visualization', action='store_true')
     args = parser.parse_args()
     return args
@@ -49,7 +49,8 @@ def main():
 
     test_rcnn(config, config.dataset.dataset, config.dataset.test_image_set, config.dataset.root_path, config.dataset.dataset_path, config.dataset.motion_iou_path,
               ctx, os.path.join(final_output_path, '..', '_'.join([iset for iset in config.dataset.image_set.split('+')]), config.TRAIN.model_prefix), config.TEST.test_epoch,
-              args.vis, args.ignore_cache, args.shuffle, config.TEST.HAS_RPN, config.dataset.proposal, args.thresh, logger=logger, output_path=final_output_path)
+              args.vis, args.ignore_cache, args.shuffle, config.TEST.HAS_RPN, config.dataset.proposal, args.thresh, logger=logger, output_path=final_output_path,
+              enable_detailed_eval=config.dataset.enable_detailed_eval)
 
 if __name__ == '__main__':
     main()

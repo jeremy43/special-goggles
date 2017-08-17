@@ -28,7 +28,6 @@ os.environ['PYTHONUNBUFFERED'] = '1'
 os.environ['MXNET_CUDNN_AUTOTUNE_DEFAULT'] = '0'
 os.environ['MXNET_ENABLE_GPU_P2P'] = '0'
 cur_path = os.path.abspath(os.path.dirname(__file__))
-
 update_config(cur_path + '/../experiments/fgfa_rfcn/cfgs/fgfa_rfcn_vid_demo.yaml')
 
 sys.path.insert(0, os.path.join(cur_path, '../external/mxnet/', cfg.MXNET_VERSION))
@@ -42,7 +41,7 @@ from utils.tictoc import tic, toc
 from nms.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Show Deep Feature Flow demo')
+    parser = argparse.ArgumentParser(description='Show Flow-Guided Feature Aggregation demo')
     args = parser.parse_args()
     return args
 

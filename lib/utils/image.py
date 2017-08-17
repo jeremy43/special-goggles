@@ -39,7 +39,62 @@ def get_image(roidb, config):
         processed_roidb.append(new_rec)
     return processed_ims, processed_roidb
 
-def get_trible_image(roidb, config):
+def get_pair_image(roidb, config):
+    """
+    preprocess image and return processed roidb
+    :param roidb: a list of roidb
+    :return: list of img as in mxnet format
+    roidb add new item['im_info']
+    0 --- x (width, second dim of im)
+    |
+    y (height, first dim of im)
+    """
+    num_images = len(roidb)
+    processed_ims = []
+    processed_ref_ims = []
+    processed_eq_flags = []
+    processed_roidb = []
+    for i in range(num_images):
+        roi_rec = roidb[i]
+
+        eq_flag = 0 # 0 for unequal, 1 for equal
+        assert os.path.exists(roi_rec['image']), '%s does not exist'.format(roi_rec['image'])
+        im = cv2.imread(roi_rec['image'], cv2.IMREAD_COLOR|cv2.IMREAD_IGNORE_ORIENTATION)
+
+        if roi_rec.has_key('pattern'):
+            ref_id = min(max(roi_rec['frame_seg_id'] + np.random.randint(config.TRAIN.MIN_OFFSET, config.TRAIN.MAX_OFFSET+1), 0),roi_rec['frame_seg_len']-1)
+            ref_image = roi_rec['pattern'] % ref_id
+            assert os.path.exists(ref_image), '%s does not exist'.format(ref_image)
+            ref_im = cv2.imread(ref_image, cv2.IMREAD_COLOR|cv2.IMREAD_IGNORE_ORIENTATION)
+            if ref_id == roi_rec['frame_seg_id']:
+                eq_flag = 1
+        else:
+            ref_im = im.copy()
+            eq_flag = 1
+
+        if roidb[i]['flipped']:
+            im = im[:, ::-1, :]
+            ref_im = ref_im[:, ::-1, :]
+
+        new_rec = roi_rec.copy()
+        scale_ind = random.randrange(len(config.SCALES))
+        target_size = config.SCALES[scale_ind][0]
+        max_size = config.SCALES[scale_ind][1]
+
+        im, im_scale = resize(im, target_size, max_size, stride=config.network.IMAGE_STRIDE)
+        ref_im, im_scale = resize(ref_im, target_size, max_size, stride=config.network.IMAGE_STRIDE)
+        im_tensor = transform(im, config.network.PIXEL_MEANS)
+        ref_im_tensor = transform(ref_im, config.network.PIXEL_MEANS)
+        processed_ims.append(im_tensor)
+        processed_ref_ims.append(ref_im_tensor)
+        processed_eq_flags.append(eq_flag)
+        im_info = [im_tensor.shape[2], im_tensor.shape[3], im_scale]
+        new_rec['boxes'] = roi_rec['boxes'].copy() * im_scale
+        new_rec['im_info'] = im_info
+        processed_roidb.append(new_rec)
+    return processed_ims, processed_ref_ims, processed_eq_flags, processed_roidb
+    
+def get_triple_image(roidb, config):
     """
     preprocess image and return processed roidb
     :param roidb: a list of roidb

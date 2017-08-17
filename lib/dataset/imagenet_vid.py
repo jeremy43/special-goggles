@@ -210,7 +210,6 @@ class ImageNetVID(IMDB):
         # make all these folders for results
 
         result_dir = os.path.join(self.result_path, 'results')
-
         if not os.path.exists(result_dir):
             os.mkdir(result_dir)
 
@@ -380,7 +379,7 @@ class ImageNetVID(IMDB):
         info_str += 'Mean AP@0.5 = {:.4f}\n\n'.format(np.mean(ap))
         return info_str
 
-    def do_python_eval_gen(self,gpu_number):
+    def do_python_eval_gen(self, gpu_number=None):
         """
         python evaluation wrapper
         :return: info_str
@@ -394,15 +393,18 @@ class ImageNetVID(IMDB):
             for i in range(len(self.pattern)):
                 for j in range(self.frame_seg_len[i]):
                     f.write((self.pattern[i] % (self.frame_seg_id[i] + j)) + ' ' + str(self.frame_id[i] + j) + '\n')
+                    
+        if gpu_number != None:
+            filenames = []
+            for i in range(gpu_number):
+                filename = self.get_result_file_template(i).format('all')
+                filenames.append(filename)
+            multifiles = True  # contains multi cache results of all boxes
+        else:
+            filenames = self.get_result_file_template().format('all')
+            multifiles = False
 
-        filenames = []
-        for i in range(gpu_number):
-            filename = self.get_result_file_template(i).format('all')
-            filenames.append(filename)
-
-        multifiles = True  # contains multi cache results of all boxes
-
-        ap = vid_eval(multifiles,filenames, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
+        ap = vid_eval(multifiles, filenames, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
                 continue
@@ -414,86 +416,10 @@ class ImageNetVID(IMDB):
         if self.enable_detailed_eval:
             # init motion areas and area ranges
             motion_ranges = [[0.0, 0.7], [0.7, 0.9], [0.9, 1.0]]
-            area_ranges = [[0, 1000 * 1000]]
+            area_ranges = [[0, 1e5 * 1e5]]
 
             if len(motion_ranges) > 1 or len(area_ranges) > 1:
-                part_ap, motion_ap, area_ap = vid_eval_motion(filename, annopath, imageset_file, self.classes_map, annocache,
-                                                          self.motion_iou_path, motion_ranges, area_ranges, ovthresh=0.5)
-                if len(motion_ranges) > 1:
-                    for motion_range_id, motion_range in enumerate(motion_ranges):
-                        print '================================================='
-                        print 'motion [{0:.1f} {1:.1f}]]:'.format( motion_range[0], motion_range[1])
-                        print('Mean AP@0.5 = {:.4f}'.format(np.mean(
-                            [motion_ap[motion_range_id][i] for i in range(len(motion_ap[motion_range_id])) if
-                             motion_ap[motion_range_id][i] >= 0])))
-                        info_str += 'motion [{0:.1f} {1:.1f}]]:'.format(motion_range[0], motion_range[1])
-                        info_str += 'Mean AP@0.5 = {:.4f}'.format(np.mean(
-                            [motion_ap[motion_range_id][i] for i in range(len(motion_ap[motion_range_id])) if
-                             motion_ap[motion_range_id][i] >= 0]))
-
-                if len(area_ranges) > 1:
-                    for area_range_id, area_range in enumerate(area_ranges):
-                        print '================================================='
-                        print 'area [{0} {1} {2} {3}]:'.format(np.sqrt(area_range[0]), np.sqrt(area_range[0]), np.sqrt(area_range[1]), np.sqrt(area_range[1]))
-                        print('Mean AP@0.5 = {:.4f}'.format(np.mean(
-                            [area_ap[area_range_id][i] for i in range(len(area_ap[area_range_id])) if
-                             area_ap[area_range_id][i] >= 0])))
-                        info_str += 'area [{0} {1} {2} {3}]:'.format(np.sqrt(area_range[0]), np.sqrt(area_range[0]),np.sqrt(area_range[1]), np.sqrt(area_range[1]))
-                        info_str += 'Mean AP@0.5 = {:.4f}'.format(np.mean(
-                            [area_ap[area_range_id][i] for i in range(len(area_ap[area_range_id])) if
-                             area_ap[area_range_id][i] >= 0]))
-
-                if len(motion_ranges) > 1 and len(area_ranges) > 1:
-                    for motion_index, motion_range in enumerate(motion_ranges):
-                        for area_index, area_range in enumerate(area_ranges):
-                            print '============================================='
-                            print 'motion [{0:.1f} {1:.1f}], area [{2} {3} {4} {5}]'.format(
-                                motion_range[0], motion_range[1], np.sqrt(area_range[0]), np.sqrt(area_range[0]),
-                                np.sqrt(area_range[1]), np.sqrt(area_range[1]))
-                            print('Mean AP@0.5 = {:.4f}'.format(np.mean(
-                                [part_ap[motion_index][area_index][i] for i in range(len(part_ap[motion_index][area_index])) if
-                                 part_ap[motion_index][area_index][i] >= 0])))
-                            info_str += 'motion [{0:.1f} {1:.1f}], area [{2} {3} {4} {5}]:'.format(
-                                motion_range[0], motion_range[1], np.sqrt(area_range[0]), np.sqrt(area_range[0]),
-                                np.sqrt(area_range[1]), np.sqrt(area_range[1]))
-                            info_str += 'Mean AP@0.5 = {:.4f}'.format(np.mean(
-                                [part_ap[motion_index][area_index][i] for i in range(len(part_ap[motion_index][area_index])) if
-                                 part_ap[motion_index][area_index][i] >= 0]))
-        return info_str
-
-    def do_python_eval_gen(self):
-        """
-        python evaluation wrapper
-        :return: info_str
-        """
-        info_str = ''
-        annopath = os.path.join(self.data_path, 'Annotations', '{0!s}.xml')
-        imageset_file = os.path.join(self.data_path, 'ImageSets', self.image_set + '_eval.txt')
-        annocache = os.path.join(self.cache_path, self.name + '_annotations.pkl')
-
-        with open(imageset_file, 'w') as f:
-            for i in range(len(self.pattern)):
-                for j in range(self.frame_seg_len[i]):
-                    f.write((self.pattern[i] % (self.frame_seg_id[i] + j)) + ' ' + str(self.frame_id[i] + j) + '\n')
-
-        filename = self.get_result_file_template().format('all')
-        multifiles=False
-        ap = vid_eval(multifiles, filename, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
-        for cls_ind, cls in enumerate(self.classes):
-            if cls == '__background__':
-                continue
-            print('AP for {} = {:.4f}'.format(cls, ap[cls_ind-1]))
-            info_str += 'AP for {} = {:.4f}\n'.format(cls, ap[cls_ind-1])
-        print('Mean AP@0.5 = {:.4f}'.format(np.mean(ap)))
-        info_str += 'Mean AP@0.5 = {:.4f}\n\n'.format(np.mean(ap))
-
-        if self.enable_detailed_eval:
-            # init motion areas and area ranges
-            motion_ranges = [[0.0, 0.7], [0.7, 0.9], [0.9, 1.0]]
-            area_ranges = [[0, 1000 * 1000]]
-
-            if len(motion_ranges) > 1 or len(area_ranges) > 1:
-                part_ap, motion_ap, area_ap = vid_eval_motion(multifiles, filename, annopath, imageset_file, self.classes_map, annocache,
+                part_ap, motion_ap, area_ap = vid_eval_motion(multifiles, filenames, annopath, imageset_file, self.classes_map, annocache,
                                                           self.motion_iou_path, motion_ranges, area_ranges, ovthresh=0.5)
                 if len(motion_ranges) > 1:
                     for motion_range_id, motion_range in enumerate(motion_ranges):

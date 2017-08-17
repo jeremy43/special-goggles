@@ -1,5 +1,3 @@
-
-# -*- coding: utf-8 -*-
 # --------------------------------------------------------
 # Flow-Guided Feature Aggregation
 # Copyright (c) 2016 by Contributors
@@ -19,93 +17,58 @@ import cPickle as pickle
 import os
 
 CLASSES = ('__background__',
-
            'airplane', 'antelope', 'bear', 'bicycle', 'bird', 'bus',
-
            'car', 'cattle', 'dog', 'domestic cat', 'elephant', 'fox',
-
            'giant panda', 'hamster', 'horse', 'lion', 'lizard', 'monkey',
-
            'motorcycle', 'rabbit', 'red panda', 'sheep', 'snake', 'squirrel',
-
            'tiger', 'train', 'turtle', 'watercraft', 'whale', 'zebra')
 
-CONF_THRESH = 0.5
-
+           
 NMS_THRESH = 0.3
-
 IOU_THRESH = 0.5
-
 MAX_THRESH=1e-2
 
 
 def createLinks(dets_all):
     links_all = []
 
-
     frame_num = len(dets_all[0])
-
     cls_num = len(CLASSES) - 1
-
     for cls_ind in range(cls_num):
-
         links_cls = []
-
         for frame_ind in range(frame_num - 1):
-
             dets1 = dets_all[cls_ind][frame_ind]
-
             dets2 = dets_all[cls_ind][frame_ind + 1]
-
             box1_num = len(dets1)
-
             box2_num = len(dets2)
-
+            
             if frame_ind == 0:
-
                 areas1 = np.empty(box1_num)
-
                 for box1_ind, box1 in enumerate(dets1):
                     areas1[box1_ind] = (box1[2] - box1[0] + 1) * (box1[3] - box1[1] + 1)
-
             else:
                 areas1 = areas2
 
             areas2 = np.empty(box2_num)
-
             for box2_ind, box2 in enumerate(dets2):
                 areas2[box2_ind] = (box2[2] - box2[0] + 1) * (box2[3] - box2[1] + 1)
 
             links_frame = []
-
             for box1_ind, box1 in enumerate(dets1):
                 area1 = areas1[box1_ind]
-
                 x1 = np.maximum(box1[0], dets2[:, 0])
-
                 y1 = np.maximum(box1[1], dets2[:, 1])
-
                 x2 = np.minimum(box1[2], dets2[:, 2])
-
                 y2 = np.minimum(box1[3], dets2[:, 3])
-
                 w = np.maximum(0.0, x2 - x1 + 1)
-
                 h = np.maximum(0.0, y2 - y1 + 1)
-
                 inter = w * h
-
                 ovrs = inter / (area1 + areas2 - inter)
-
                 links_box = [ovr_ind for ovr_ind, ovr in enumerate(ovrs) if
                              ovr >= IOU_THRESH]
-
                 links_frame.append(links_box)
-
             links_cls.append(links_frame)
-
         links_all.append(links_cls)
-
     return links_all
 
 
@@ -114,7 +77,6 @@ def maxPath(dets_all, links_all):
     for cls_ind, links_cls in enumerate(links_all):
 
         max_begin = time.time()
-
         delete_sets=[[]for i in range(0,len(dets_all[0]))]
         delete_single_box=[]
         dets_cls = dets_all[cls_ind]
@@ -205,12 +167,6 @@ def findMaxPath(links,dets,delete_single_box):
     return rootindex, maxpath, maxscore
 
 
-
-
-#
-
-#
-
 def rescore(dets, rootindex, maxpath, maxsum):
     newscore = maxsum / len(maxpath)
 
@@ -224,36 +180,24 @@ def deleteLink(dets, links, rootindex, maxpath, thesh):
     num_delete_links=0
 
     for i, box_ind in enumerate(maxpath):
-
         areas = [(box[2] - box[0] + 1) * (box[3] - box[1] + 1) for box in dets[rootindex + i]]
-
         area1 = areas[box_ind]
-
         box1 = dets[rootindex + i][box_ind]
-
         x1 = np.maximum(box1[0], dets[rootindex + i][:, 0])
-
         y1 = np.maximum(box1[1], dets[rootindex + i][:, 1])
-
         x2 = np.minimum(box1[2], dets[rootindex + i][:, 2])
-
         y2 = np.minimum(box1[3], dets[rootindex + i][:, 3])
-
         w = np.maximum(0.0, x2 - x1 + 1)
-
         h = np.maximum(0.0, y2 - y1 + 1)
-
         inter = w * h
 
         ovrs = inter / (area1 + areas - inter)
-
         #saving the box need to delete
         deletes = [ovr_ind for ovr_ind, ovr in enumerate(ovrs) if ovr >= 0.3]
         delete_set.append(deletes)
 
         #delete the links except for the last frame
         if rootindex + i < len(links):
-
             for delete_ind in deletes:
                 num_delete_links+=len(links[rootindex+i][delete_ind])
                 links[rootindex + i][delete_ind] = []
@@ -262,17 +206,12 @@ def deleteLink(dets, links, rootindex, maxpath, thesh):
 
             #delete the links which point to box_ind
             for priorbox in links[rootindex + i - 1]:
-
                 for delete_ind in deletes:
-
                     if delete_ind in priorbox:
                         priorbox.remove(delete_ind)
                         num_delete_links+=1
 
     return delete_set,num_delete_links
-
-
-
 
 def seq_nms(dets):
     links = createLinks(dets)

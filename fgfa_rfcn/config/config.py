@@ -40,7 +40,7 @@ config.network.NORMALIZE_RPN = True
 config.network.ANCHOR_MEANS = (0.0, 0.0, 0.0, 0.0)
 config.network.ANCHOR_STDS = (0.1, 0.1, 0.4, 0.4)
 config.network.NUM_ANCHORS = len(config.network.ANCHOR_SCALES) * len(config.network.ANCHOR_RATIOS)
-config.network.FGFA_FEAT_DIM = 1024
+config.network.FGFA_FEAT_DIM = 1024 + 2048 # 1024 for feature network, 2048 for embedding network
 
 # dataset related params
 config.dataset = edict()
@@ -49,7 +49,8 @@ config.dataset.image_set = 'DET_train_30classes+VID_train_15frames'
 config.dataset.test_image_set = 'VID_val_videos'
 config.dataset.root_path = './data'
 config.dataset.dataset_path = './data/ILSVRC2015'
-config.dataset.motion_iou_path = './lib/dataset/groundtruth_motion_iou.mat'
+config.dataset.motion_iou_path = './lib/dataset/imagenet_vid_groundtruth_motion_iou.mat'
+config.dataset.enable_detailed_eval = True
 config.dataset.NUM_CLASSES = 31
 
 
@@ -140,13 +141,12 @@ config.TEST.RPN_MIN_SIZE = config.network.RPN_FEAT_STRIDE
 
 # RCNN nms
 config.TEST.NMS = 0.3
+config.TEST.max_per_image = 300
 
 #
 config.TEST.KEY_FRAME_INTERVAL = 9
 config.TEST.SEQ_NMS = False
 
-
-config.TEST.max_per_image = 300
 
 # Test Model Epoch
 config.TEST.test_epoch = 0

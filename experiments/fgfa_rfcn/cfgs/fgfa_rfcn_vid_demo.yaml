@@ -19,11 +19,8 @@ network:
   RPN_FEAT_STRIDE: 16
   FIXED_PARAMS:
   - conv1
-  - bn_conv1
   - res2
-  - bn2
-  - gamma
-  - beta
+  - bn
   ANCHOR_RATIOS:
   - 0.5
   - 1
@@ -129,7 +126,7 @@ TEST:
   HAS_RPN: true
   # size of images for each device
   BATCH_IMAGES: 1
-  SEQ_NMS: true
+  SEQ_NMS: false
 
   # RPN proposal
   CXX_PROPOSAL: true

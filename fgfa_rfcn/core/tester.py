@@ -128,8 +128,8 @@ def get_resnet_output(predictor, data_batch, data_names):
     output_all = predictor.predict(data_batch)
     data_dict_all = [dict(zip(data_names, data_batch.data[i])) for i in xrange(len(data_batch.data))]
 
-    if output_all[0].has_key('feat_conv_3x3_relu_output'):
-        feat = output_all[0]['feat_conv_3x3_relu_output']
+    if output_all[0].has_key('conv_embed_output'):
+        feat = output_all[0]['conv_embed_output']
     else:
         feat = None
     return data_dict_all[0]['data'], feat.copy()
@@ -353,27 +353,6 @@ def pred_eval(gpu_id, feat_predictors, aggr_predictors, test_data, imdb, cfg, vi
                                                                                              post_time / idx * test_data.batch_size))
                 end_counter += 1
 
-            # if  cfg.TEST.SEQ_NMS:
-            #     t4 = time.time()
-            #
-            #     video = [all_boxes[j][last_idx:idx] for j in range(1, imdb.num_classes)]
-            #     dets_all = seq_nms(video)
-            #     for cls_ind, dets_cls in enumerate(dets_all):
-            #         for frame_ind, dets in enumerate(dets_cls):
-            #             keep=nms(dets)
-            #             all_boxes[cls_ind+1][frame_ind+last_idx] = dets[keep,:]
-            #
-            #     last_idx = idx
-            #     video_idx += 1
-            #
-            #     video_time = time.time() - t4
-            #     seq_time += video_time
-            #
-            #     print 'video_index {} length of video {} seqnms_video_time {:.4f}s  seqnms_time_per_image {:.4f}'.format(video_idx,len(video[0]),video_time,seq_time/idx*test_data.batch_size)
-            #     if logger:
-            #         logger.info('video_index {} length of video {} seqnms_video_time {:.4f}s  seqnms_time_per_image {:.4f}'.format(video_idx,len(video[0]),video_time,seq_time/idx*test_data.batch_size))
-
-
     with open(det_file, 'wb') as f:
         cPickle.dump((all_boxes, frame_ids), f, protocol=cPickle.HIGHEST_PROTOCOL)
 
@@ -381,15 +360,13 @@ def pred_eval(gpu_id, feat_predictors, aggr_predictors, test_data, imdb, cfg, vi
 
 def run_dill_encode(payload):
     fun,args=dill.loads(payload)
-
     return fun(*args)
+    
 def apply_async(pool,fun,args):
-
     payload=dill.dumps((fun,args))
-
     return pool.apply_async(run_dill_encode,(payload,))
 
-def pred_eval_multiprocess(gpu_num, key_predictors, cur_predictors, test_datas, imdb, cfg, vis=False, thresh=1e-4, logger=None, ignore_cache=True):
+def pred_eval_multiprocess(gpu_num, key_predictors, cur_predictors, test_datas, imdb, cfg, vis=False, thresh=1e-3, logger=None, ignore_cache=True):
 
     if cfg.TEST.SEQ_NMS==False:
         if gpu_num == 1:
@@ -472,7 +449,7 @@ def vis_all_detection(im_array, detections, class_names, scale, cfg, threshold=0
     plt.show()
 
 
-def draw_all_detection(im_array, detections, class_names, scale, cfg, threshold=1e-1):
+def draw_all_detection(im_array, detections, class_names, scale, cfg, threshold=0.1):
     """
     visualize all detections in one image
     :param im_array: [b=1 c h w] in rgb

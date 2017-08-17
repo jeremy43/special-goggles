@@ -12,7 +12,7 @@ from mxnet.executor_manager import _split_input_slice
 
 from config.config import config
 from utils.image import tensor_vstack
-from rpn.rpn import get_rpn_testbatch, get_rpn_pair_batch, assign_anchor
+from rpn.rpn import get_rpn_testbatch, get_rpn_triple_batch, assign_anchor
 from rcnn import get_rcnn_testbatch, get_rcnn_batch
 
 class TestLoader(mx.io.DataIter):
@@ -292,7 +292,7 @@ class AnchorLoader(mx.io.DataIter):
         label_list = []
         for islice in slices:
             iroidb = [roidb[i] for i in range(islice.start, islice.stop)]
-            data, label = get_rpn_pair_batch(iroidb, self.cfg)
+            data, label = get_rpn_triple_batch(iroidb, self.cfg)
             data_list.append(data)
             label_list.append(label)
 
@@ -354,7 +354,7 @@ class AnchorLoader(mx.io.DataIter):
 
     def parfetch(self, iroidb):
         # get testing data for multigpu
-        data, label = get_rpn_pair_batch(iroidb, self.cfg)
+        data, label = get_rpn_triple_batch(iroidb, self.cfg)
         data_shape = {k: v.shape for k, v in data.items()}
         del data_shape['im_info']
         _, feat_shape, _ = self.feat_sym.infer_shape(**data_shape)

@@ -2,7 +2,7 @@
 MXNET_VERSION: "mxnet"
 output_path: "./output/fgfa_rfcn/imagenet_vid"
 symbol: resnet_v1_101_flownet_rfcn
-gpus: '0,1'
+gpus: '0,1,2,3'
 CLASS_AGNOSTIC: true
 SCALES:
 - 600
@@ -53,6 +53,8 @@ dataset:
   root_path: "./data"
   test_image_set: VID_val_videos
   proposal: rpn
+  motion_iou_path: './lib/dataset/imagenet_vid_groundtruth_motion_iou.mat'
+  enable_detailed_eval: true
 TRAIN:
   lr: 0.00025
   lr_step: '1.333'
@@ -130,6 +132,8 @@ TEST:
   HAS_RPN: true
   # size of images for each device
   BATCH_IMAGES: 1
+  SEQ_NMS: false
+  
   # RPN proposal
   CXX_PROPOSAL: true
   RPN_NMS_THRESH: 0.7

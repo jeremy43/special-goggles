@@ -16,6 +16,10 @@ This repository is implemented by [Yuqing Zhu](mailto:141160088@smail.nju.edu.cn
 
 [![Demo Video on YouTube](https://media.giphy.com/media/7D9tmDgzB10HK/giphy.gif)](https://www.youtube.com/watch?v=R2h3DbTPvVg)
 
+*** Example object instances with slow, medium and fast motions***
+
+![Instance Motion](instance_motion.jpg)
+
 ## Disclaimer
 
 This is an official implementation for [Flow-Guided Feature Aggregation for Video Recognition](https://arxiv.org/abs/1703.10025) (FGFA) based on MXNet. It is worth noticing that:

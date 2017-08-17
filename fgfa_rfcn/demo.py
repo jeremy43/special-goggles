@@ -167,7 +167,6 @@ def main():
                                  provide_data=[[(k, v.shape) for k, v in zip(data_names, data[idx])]],
                                  provide_label=[None])
     scales = [data_batch.data[i][1].asnumpy()[0, 2] for i in xrange(len(data_batch.data))]
-    # data = data[0:20]
     all_boxes = [[[] for _ in range(len(data))]
                  for _ in range(num_classes)]
     data_list = deque(maxlen=all_frame_interval)

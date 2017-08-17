@@ -67,7 +67,7 @@ def vid_ap(rec, prec):
     return ap
 
 
-def vid_eval(multifiles,detpath, annopath, imageset_file, classname_map, annocache, ovthresh=0.5):
+def vid_eval(multifiles, detpath, annopath, imageset_file, classname_map, annocache, ovthresh=0.5):
     """
     imagenet vid evaluation
     :param detpath: detection results detpath.format(classname)

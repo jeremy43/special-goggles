@@ -379,6 +379,7 @@ class ImageNetVID(IMDB):
         print('Mean AP@0.5 = {:.4f}'.format(np.mean(ap)))
         info_str += 'Mean AP@0.5 = {:.4f}\n\n'.format(np.mean(ap))
         return info_str
+
     def do_python_eval_gen(self,gpu_number):
         """
         python evaluation wrapper
@@ -477,7 +478,7 @@ class ImageNetVID(IMDB):
 
         filename = self.get_result_file_template().format('all')
         multifiles=False
-        ap = vid_eval(multifiles,filename, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
+        ap = vid_eval(multifiles, filename, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
                 continue
@@ -492,7 +493,7 @@ class ImageNetVID(IMDB):
             area_ranges = [[0, 1000 * 1000]]
 
             if len(motion_ranges) > 1 or len(area_ranges) > 1:
-                part_ap, motion_ap, area_ap = vid_eval_motion(filename, annopath, imageset_file, self.classes_map, annocache,
+                part_ap, motion_ap, area_ap = vid_eval_motion(multifiles, filename, annopath, imageset_file, self.classes_map, annocache,
                                                           self.motion_iou_path, motion_ranges, area_ranges, ovthresh=0.5)
                 if len(motion_ranges) > 1:
                     for motion_range_id, motion_range in enumerate(motion_ranges):

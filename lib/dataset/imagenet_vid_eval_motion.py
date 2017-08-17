@@ -69,7 +69,7 @@ def vid_ap(rec, prec):
     return ap
 
 
-def vid_eval_motion(detpath, annopath, imageset_file, classname_map, annocache, motion_iou_file, motion_ranges, area_ranges, ovthresh=0.5):
+def vid_eval_motion(multifiles, detpath, annopath, imageset_file, classname_map, annocache, motion_iou_file, motion_ranges, area_ranges, ovthresh=0.5):
     """
     imagenet vid evaluation
     :param detpath: detection results detpath.format(classname)
@@ -101,9 +101,16 @@ def vid_eval_motion(detpath, annopath, imageset_file, classname_map, annocache, 
             recs = cPickle.load(f)
 
     # read detections
-    with open(detpath,'r') as f:
-        lines=f.readlines()
-    splitlines = [x.strip().split(' ') for x in lines]
+    splitlines = []
+    if (multifiles == False):
+        with open(detpath, 'r') as f:
+            lines = f.readlines()
+        splitlines = [x.strip().split(' ') for x in lines]
+    else:
+        for det in detpath:
+            with open(det, 'r') as f:
+                lines = f.readlines()
+            splitlines += [x.strip().split(' ') for x in lines]
 
     splitlines=np.array(splitlines)
     img_ids = splitlines[:,0].astype(int)

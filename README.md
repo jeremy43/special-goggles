@@ -6,9 +6,9 @@ This repository is implemented by [Yuqing Zhu](mailto:141160088@smail.nju.edu.cn
 ## Introduction
 
 
-**Flow-Guided Feature Aggregation (FGFA)** is initially described in a [ICCV 2017 paper](https://arxiv.org/abs/1703.10025). It provides an accurate and end-to-end learning framework for video object detection. It is worth noting that:
+**Flow-Guided Feature Aggregation (FGFA)** is initially described in an [ICCV 2017 paper](https://arxiv.org/abs/1703.10025). It provides an accurate and end-to-end learning framework for video object detection. It is worth noting that:
 
-* FGFA improves the per-frame features by aggregating nearby frame features along the motion paths, and significantly improves the object detection accuracy in videos, especially for fast moving objects.
+* FGFA improves the per-frame features by aggregating nearby frame features along the motion paths. It  significantly improves the object detection accuracy in videos, especially for fast moving objects.
 * FGFA is end-to-end trainable for the task of video object detection, which is vital for improving the recognition accuracy.
 * We proposed to evaluate the detection accuracy for slow, medium and fast moving objects respectively, for better understanding and analysis of video object detection. The [motion-specific evaluation code](lib/dataset/imagenet_vid_eval_motion.py) is included in this repository.
 

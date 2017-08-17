@@ -18,7 +18,7 @@ This repository is implemented by [Yuqing Zhu](mailto:141160088@smail.nju.edu.cn
 
 ***Example object instances with slow, medium and fast motions***
 
-![Instance Motion](instance_motion.jpg)
+![Instance Motion](instance_motion.png)
 
 ## Disclaimer
 

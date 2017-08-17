@@ -1,15 +1,16 @@
 # Flow-Guided Feature Aggregation for Video Object Detection
 
 
-The major contributors of this repository include [Yuqing Zhu](mailto:141160088@smail.nju.edu.cn), [Shuhao Fu](https://github.com/howardmumu), [Xizhou Zhu](https://github.com/einsiedler0408).
+This repository is implemented by [Yuqing Zhu](mailto:141160088@smail.nju.edu.cn), [Shuhao Fu](https://github.com/howardmumu), [Xizhou Zhu](https://github.com/einsiedler0408), when they are interns at MSRA.
 
 ## Introduction
 
 
-**Flow-Guided Feature Aggregation** is initially described in a [ICCV 2017 paper](https://arxiv.org/abs/1703.10025). It provides an accurate and end-to-end learning framework for video object detection. It is worth noting that:
+**Flow-Guided Feature Aggregation (FGFA)** is initially described in a [ICCV 2017 paper](https://arxiv.org/abs/1703.10025). It provides an accurate and end-to-end learning framework for video object detection. It is worth noting that:
 
-* Flow-Guided Feature Aggregation improves the per-frame features by aggregation of nearby features along the motion paths, thus significantly improves the video object detection accuracy, especially for more challenging fast moving objects.
-* The entire system is end-to-end trained for the task of video recognition, which is vital for improving the recognition accuracy.
+* FGFA improves the per-frame features by aggregating nearby frame features along the motion paths, and significantly improves the object detection accuracy in videos, especially for fast moving objects.
+* FGFA is end-to-end trainable for the task of video object detection, which is vital for improving the recognition accuracy.
+* We proposed to evaluate the detection accuracy for slow, medium and fast moving objects respectively, for better understanding and analysis of video object detection. The [motion-specific evaluation code](lib/dataset/imagenet_vid_eval_motion.py) is included in this repository.
 
 ***Click image to watch our demo video***
 
@@ -20,7 +21,7 @@ The major contributors of this repository include [Yuqing Zhu](mailto:141160088@
 This is an official implementation for [Flow-Guided Feature Aggregation for Video Recognition](https://arxiv.org/abs/1703.10025) (FGFA) based on MXNet. It is worth noticing that:
 
   * The original implementation is based on our internal Caffe version on Windows. There are slight differences in the final accuracy and running time due to the plenty details in platform switch.
-  * This repository performs one-phase training on the mixture dataset of ImageNet DET+VID, instead of two-phase training (first trained on ImageNet DET, then trained on ImageNet VID) which is performed in the original paper.
+  * One-phase training is performed on the mixture of ImageNet DET+VID, instead of two-phase training as in the original paper (on ImageNet DET first, followed by ImageNet VID).
   * The code is tested on official [MXNet@(v0.10.0)](https://github.com/apache/incubator-mxnet/tree/v0.10.0) with the extra operators for Flow-guided Feature Aggregation.
   * We trained our model based on the ImageNet pre-trained [ResNet-v1-101](https://github.com/KaimingHe/deep-residual-networks) model and [Flying Chairs](https://lmb.informatik.uni-freiburg.de/resources/datasets/FlyingChairs.en.html) pre-trained [FlowNet](https://lmb.informatik.uni-freiburg.de/resources/binaries/dispflownet/dispflownet-release-1.2.tar.gz) model using a [model converter](https://github.com/dmlc/mxnet/tree/430ea7bfbbda67d993996d81c7fd44d3a20ef846/tools/caffe_converter). The converted [ResNet-v1-101](https://github.com/KaimingHe/deep-residual-networks) model produces slightly lower accuracy (Top-1 Error on ImageNet val: 24.0% v.s. 23.6%).
   * This repository used code from [MXNet rcnn example](https://github.com/apache/incubator-mxnet/tree/master/example/rcnn) and [mx-rfcn](https://github.com/giorking/mx-rfcn).
@@ -53,17 +54,18 @@ If you find Flow-Guided Feature Aggregation useful in your research, please cons
 ## Main Results
 
 
-|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP(%)</sub> | <sub>mAP(%)</br>(slow)</sub>  | <sub>mAP(%)</br>(medium)</sub> | <sub>mAP(%)</br>(fast)</sub> |
+|                                 | <sub>training data</sub>     | <sub>testing data</sub> | <sub>mAP(%)</sub> | <sub>mAP(%)</br>(slow)</sub>  | <sub>mAP(%)</br>(medium)</sub> | <sub>mAP(%)</br>(fast)</sub> |
 |---------------------------------|-------------------|--------------|---------|---------|--------|--------|
 | <sub>Single-frame baseline</br>(R-FCN, ResNet-v1-101)</sub>   | <sub>ImageNet DET train</br> + VID train</sub> | <sub>ImageNet VID validation</sub> | 74.1 | 83.6 | 71.6 | 51.2 |
 | <sub>FGFA</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>           | <sub>ImageNet DET train</br> + VID train</sub> | <sub>ImageNet VID validation</sub> | 77.1 | 85.9 | 75.7 | 56.1 |
 | <sub>FGFA + SeqNMS</br>(R-FCN, ResNet-v1-101, FlowNet)</sub>  | <sub>ImageNet DET train</br> + VID train</sub> | <sub>ImageNet VID validation</sub> | 78.9 | 86.8 | 77.9 | 57.9 |
 
-**[Motion-specific evaluation code](lib/dataset/imagenet_vid_eval_motion.py) for video object detection is included in this repository. The original object detection evaluation disregards object motion, which is insufficient for video object detection analysis.**
+
 
 *Detection accuracy of slow (motion IoU > 0.9), medium (0.7 ≤ motion IoU ≤ 0.9), and fast (motion IoU < 0.7) moving object instances.*
 
-*Single-frame baseline model is from [Deep-Feature-Flow](https://github.com/msracver/Deep-Feature-Flow).*
+**[Motion-specific evaluation code](lib/dataset/imagenet_vid_eval_motion.py) is available!**
+
 
 ## Requirements: Software
 
@@ -84,7 +86,7 @@ Any NVIDIA GPUs with at least 8GB memory should be OK
 
 ## Installation
 
-1. Clone the Flow-Guided Feature Aggregation repository, and we'll call the directory that you cloned Flow-Guided-Feature-Aggregation as ${FGFA_ROOT}.
+1. Clone the Flow-Guided Feature Aggregation repository, and we call the directory that you cloned as ${FGFA_ROOT}.
 
 ~~~
 git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
@@ -156,9 +158,9 @@ git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
 
 1. All of our experiment settings (GPU #, dataset, etc.) are kept in yaml config files at folder `./experiments/fgfa_rfcn/cfgs`.
 
-2. Two config files have been provided so far, namely, Frame baseline with R-FCN and Flow-Guided-Feature-Aggregation with R-FCN for ImageNet VID. We use 4 GPUs to train models on ImageNet VID.
+2. Two config files have been provided so far, namely, frame baseline (R-FCN) and the proposed FGFA  for ImageNet VID. We use 4 GPUs to train models on ImageNet VID.
 
-3. To perform experiments, run the python script with the corresponding config file as input. For example, to train and test Flow-Guided Feature Aggregation with R-FCN, use the following command
+3. To perform experiments, run the python script with the corresponding config file as input. For example, to train and test FGFA with R-FCN, use the following command
     ```
     python experiments/fgfa_rfcn/fgfa_rfcn_end2end_train_test.py --cfg experiments/fgfa_rfcn/cfgs/resnet_v1_101_flownet_imagenet_vid_rfcn_end2end_ohem.yaml
     ```

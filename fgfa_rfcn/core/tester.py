@@ -12,7 +12,7 @@ import os
 import time
 import mxnet as mx
 import numpy as np
-
+import dill
 from module import MutableModule
 from utils import image
 from bbox.bbox_transform import bbox_pred, clip_boxes
@@ -190,6 +190,18 @@ def im_batch_detect(predictor, data_batch, data_names, scales, cfg):
 
     return scores_all, pred_boxes_all, data_dict_all
 
+def pred_eval_seqnms(gpu_id,imdb):
+
+    det_file = os.path.join(imdb.result_path, imdb.name + '_' + str(gpu_id) + '_'
+                                                                              ''
+                                                                              '')
+
+    if os.path.exists(det_file):
+        with open(det_file, 'rb') as fid:
+            all_boxes, frame_ids = dill.load(fid)
+
+        res=[all_boxes, frame_ids]
+        imdb.evaluate_detections_multiprocess_seqnms(res, gpu_id)
 
 def pred_eval(gpu_id, feat_predictors, aggr_predictors, test_data, imdb, cfg, vis=False, thresh=1e-3, logger=None, ignore_cache=True):
     """
@@ -341,25 +353,25 @@ def pred_eval(gpu_id, feat_predictors, aggr_predictors, test_data, imdb, cfg, vi
                                                                                              post_time / idx * test_data.batch_size))
                 end_counter += 1
 
-            if  cfg.TEST.SEQ_NMS:
-                t4 = time.time()
-
-                video = [all_boxes[j][last_idx:idx] for j in range(1, imdb.num_classes)]
-                dets_all = seq_nms(video)
-                for cls_ind, dets_cls in enumerate(dets_all):
-                    for frame_ind, dets in enumerate(dets_cls):
-                        keep=nms(dets)
-                        all_boxes[cls_ind+1][frame_ind+last_idx] = dets[keep,:]
-
-                last_idx = idx
-                video_idx += 1
-
-                video_time = time.time() - t4
-                seq_time += video_time
-
-                print 'video_index {} length of video {} seqnms_video_time {:.4f}s  seqnms_time_per_image {:.4f}'.format(video_idx,len(video[0]),video_time,seq_time/idx*test_data.batch_size)
-                if logger:
-                    logger.info('video_index {} length of video {} seqnms_video_time {:.4f}s  seqnms_time_per_image {:.4f}'.format(video_idx,len(video[0]),video_time,seq_time/idx*test_data.batch_size))
+            # if  cfg.TEST.SEQ_NMS:
+            #     t4 = time.time()
+            #
+            #     video = [all_boxes[j][last_idx:idx] for j in range(1, imdb.num_classes)]
+            #     dets_all = seq_nms(video)
+            #     for cls_ind, dets_cls in enumerate(dets_all):
+            #         for frame_ind, dets in enumerate(dets_cls):
+            #             keep=nms(dets)
+            #             all_boxes[cls_ind+1][frame_ind+last_idx] = dets[keep,:]
+            #
+            #     last_idx = idx
+            #     video_idx += 1
+            #
+            #     video_time = time.time() - t4
+            #     seq_time += video_time
+            #
+            #     print 'video_index {} length of video {} seqnms_video_time {:.4f}s  seqnms_time_per_image {:.4f}'.format(video_idx,len(video[0]),video_time,seq_time/idx*test_data.batch_size)
+            #     if logger:
+            #         logger.info('video_index {} length of video {} seqnms_video_time {:.4f}s  seqnms_time_per_image {:.4f}'.format(video_idx,len(video[0]),video_time,seq_time/idx*test_data.batch_size))
 
 
     with open(det_file, 'wb') as f:
@@ -367,19 +379,64 @@ def pred_eval(gpu_id, feat_predictors, aggr_predictors, test_data, imdb, cfg, vi
 
     return all_boxes, frame_ids
 
+def run_dill_encode(payload):
+    fun,args=dill.loads(payload)
+
+    return fun(*args)
+def apply_async(pool,fun,args):
+
+    payload=dill.dumps((fun,args))
+
+    return pool.apply_async(run_dill_encode,(payload,))
 
 def pred_eval_multiprocess(gpu_num, key_predictors, cur_predictors, test_datas, imdb, cfg, vis=False, thresh=1e-4, logger=None, ignore_cache=True):
-    if gpu_num == 1:
-        res = [pred_eval(0, key_predictors[0], cur_predictors[0], test_datas[0], imdb, cfg, vis, thresh, logger, ignore_cache),]
-    else:
+
+    if cfg.TEST.SEQ_NMS==False:
+        if gpu_num == 1:
+            res = [pred_eval(0, key_predictors[0], cur_predictors[0], test_datas[0], imdb, cfg, vis, thresh, logger,
+                             ignore_cache), ]
+        else:
+            from multiprocessing.pool import ThreadPool as Pool
+            pool = Pool(processes=gpu_num)
+            multiple_results = [pool.apply_async(pred_eval, args=(
+            i, key_predictors[i], cur_predictors[i], test_datas[i], imdb, cfg, vis, thresh, logger, ignore_cache)) for i
+                                in range(gpu_num)]
+            pool.close()
+            pool.join()
+            res = [res.get() for res in multiple_results]
+        info_str = imdb.evaluate_detections_multiprocess(res)
+
+
+    else :
+        if gpu_num == 1:
+            res = [pred_eval(0, key_predictors[0], cur_predictors[0], test_datas[0], imdb, cfg, vis, thresh, logger, ignore_cache),]
+
+        else:
+            from multiprocessing.pool import ThreadPool as Pool
+
+            pool = Pool(processes=gpu_num)
+            multiple_results = [pool.apply_async(pred_eval, args=(
+            i, key_predictors[i], cur_predictors[i], test_datas[i], imdb, cfg, vis, thresh, logger, ignore_cache)) for i in
+                                range(gpu_num)]
+            pool.close()
+            pool.join()
+            res = [res.get() for res in multiple_results]
+
+
+        print 'finish reading cache for seqnms'
+        from multiprocessing import Pool as Pool
         pool = Pool(processes=gpu_num)
-        multiple_results = [pool.apply_async(pred_eval,args=(i, key_predictors[i], cur_predictors[i], test_datas[i], imdb, cfg, vis, thresh, logger, ignore_cache)) for i in range(gpu_num)]
-        pool.close()
-        pool.join()
-        res = [res.get() for res in multiple_results]
-    info_str = imdb.evaluate_detections_multiprocess(res)
+        jobs = []
+        res=[]
+        for i in range(gpu_num):
+            job = apply_async(pool, pred_eval_seqnms, (i, imdb))
+            jobs.append(job)
+        for job in jobs:
+            res.append(job.get())
+        info_str = imdb.do_python_eval_gen(gpu_num)
     if logger:
         logger.info('evaluate detections: \n{}'.format(info_str))
+
 
 
 def vis_all_detection(im_array, detections, class_names, scale, cfg, threshold=0.1):

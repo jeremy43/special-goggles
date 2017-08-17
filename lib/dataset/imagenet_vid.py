@@ -2,7 +2,7 @@
 # #Flow-Guided-Feature-Aggregation
 # Copyright (c) 2017 Microsoft
 # Licensed under The Apache-2.0 License [see LICENSE for details]
-# Written by Xizhou Zhu, Yuqing Zhu, Shuhao Fu, Yuqing Zhu, Shuhao Fu
+# Written by Xizhou Zhu, Shuhao Fu
 # --------------------------------------------------------
 
 """
@@ -17,11 +17,12 @@ import cPickle
 import cv2
 import os
 import numpy as np
-
+import time
 from imdb import IMDB
 from imagenet_vid_eval import vid_eval
 from imagenet_vid_eval_motion import vid_eval_motion
 from ds_utils import unique_boxes, filter_small_boxes
+from nms.nms import py_nms_wrapper, cpu_nms_wrapper, gpu_nms_wrapper
 
 
 class ImageNetVID(IMDB):
@@ -199,6 +200,22 @@ class ImageNetVID(IMDB):
         info = self.do_python_eval()
         return info
 
+    def evaluate_detections_multiprocess_seqnms(self, detections, gpu_id):
+        """
+        top level evaluations
+        :param detections: result matrix, [bbox, confidence]
+        :return: None
+        """
+        # make all these folders for results
+
+        result_dir = os.path.join(self.result_path, 'results')
+
+        if not os.path.exists(result_dir):
+            os.mkdir(result_dir)
+
+        self.write_vid_results_multiprocess(detections, gpu_id)
+        return 1
+
     def evaluate_detections_multiprocess(self, detections):
         """
         top level evaluations
@@ -214,6 +231,15 @@ class ImageNetVID(IMDB):
         info = self.do_python_eval_gen()
         return info
 
+    def get_result_file_template(self, gpu_id):
+        """
+        :return: a string template
+        """
+        res_file_folder = os.path.join(self.result_path, 'results')
+        filename = 'det_' + self.image_set + str(gpu_id) + '_{:s}.txt'
+        path = os.path.join(res_file_folder, filename)
+        return path
+
     def get_result_file_template(self):
         """
         :return: a string template
@@ -222,6 +248,68 @@ class ImageNetVID(IMDB):
         filename = 'det_' + self.image_set + '_{:s}.txt'
         path = os.path.join(res_file_folder, filename)
         return path
+
+    def write_vid_results_multiprocess(self, detection, gpu_id):
+        """
+        write results files in pascal devkit path
+        :param all_boxes: boxes to be processed [bbox, confidence]
+        :return: None
+        """
+        print 'here'
+        print 'Writing {} ImageNetVID results file'.format('all')
+        filename = self.get_result_file_template(gpu_id).format('all')
+        frame_seg_len = self.frame_seg_len
+        nms = py_nms_wrapper(0.3)
+        data_time = 0
+        all_boxes = detection[0]
+        frame_ids = detection[1]
+        start_idx = 0
+        sum_frame_ids = np.cumsum(frame_seg_len)
+        first_true_id = frame_ids[0]
+        start_video = np.searchsorted(sum_frame_ids, first_true_id)
+
+        for im_ind in range(1, len(frame_ids)):
+            t = time.time()
+            true_id = frame_ids[im_ind]
+            video_index = np.searchsorted(sum_frame_ids, true_id)
+            if (video_index != start_video):  # reprensents a new video
+                t1 = time.time()
+                video = [all_boxes[j][start_idx:im_ind] for j in range(1, self.num_classes)]
+                dets_all = seq_nms(video)
+                for j in xrange(1, self.num_classes):
+                    for frame_ind, dets in enumerate(dets_all[j - 1]):
+                        keep = nms(dets)
+                        all_boxes[j][frame_ind + start_idx] = dets[keep, :]
+                start_idx = im_ind
+                start_video = video_index
+                t2 = time.time()
+                print 'video_index=', video_index, '  time=', t2 - t1
+            data_time += time.time() - t
+            if (im_ind % 100 == 0):
+                print '{} seq_nms testing {} data {:.4f}s'.format(frame_ids[im_ind - 1], im_ind, data_time / im_ind)
+
+        # the last video
+        video = [all_boxes[j][start_idx:im_ind] for j in range(1, self.num_classes)]
+        dets_all = seq_nms(video)
+        for j in xrange(1, self.num_classes):
+            for frame_ind, dets in enumerate(dets_all[j - 1]):
+                keep = nms(dets)
+                all_boxes[j][frame_ind + start_idx] = dets[keep, :]
+
+        with open(filename, 'wt') as f:
+            for im_ind in range(len(frame_ids)):
+                for cls_ind, cls in enumerate(self.classes):
+                    if cls == '__background__':
+                        continue
+                    dets = all_boxes[cls_ind][im_ind]
+                    if len(dets) == 0:
+                        continue
+                    # the imagenet expects 0-based indices
+                    for k in range(dets.shape[0]):
+                        f.write('{:d} {:d} {:.4f} {:.2f} {:.2f} {:.2f} {:.2f}\n'.
+                                format(frame_ids[im_ind], cls_ind, dets[k, -1],
+                                       dets[k, 0], dets[k, 1], dets[k, 2], dets[k, 3]))
+        return
 
     def write_vid_results(self, all_boxes):
         """
@@ -290,6 +378,86 @@ class ImageNetVID(IMDB):
         print('Mean AP@0.5 = {:.4f}'.format(np.mean(ap)))
         info_str += 'Mean AP@0.5 = {:.4f}\n\n'.format(np.mean(ap))
         return info_str
+    def do_python_eval_gen(self,gpu_number):
+        """
+        python evaluation wrapper
+        :return: info_str
+        """
+        info_str = ''
+        annopath = os.path.join(self.data_path, 'Annotations', '{0!s}.xml')
+        imageset_file = os.path.join(self.data_path, 'ImageSets', self.image_set + '_eval.txt')
+        annocache = os.path.join(self.cache_path, self.name + '_annotations.pkl')
+
+        with open(imageset_file, 'w') as f:
+            for i in range(len(self.pattern)):
+                for j in range(self.frame_seg_len[i]):
+                    f.write((self.pattern[i] % (self.frame_seg_id[i] + j)) + ' ' + str(self.frame_id[i] + j) + '\n')
+
+        filenames = []
+        for i in range(gpu_number):
+            filename = self.get_result_file_template(i).format('all')
+            filenames.append(filename)
+
+        multifiles = True  # contains multi cache results of all boxes
+
+        ap = vid_eval(multifiles,filenames, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
+        for cls_ind, cls in enumerate(self.classes):
+            if cls == '__background__':
+                continue
+            print('AP for {} = {:.4f}'.format(cls, ap[cls_ind-1]))
+            info_str += 'AP for {} = {:.4f}\n'.format(cls, ap[cls_ind-1])
+        print('Mean AP@0.5 = {:.4f}'.format(np.mean(ap)))
+        info_str += 'Mean AP@0.5 = {:.4f}\n\n'.format(np.mean(ap))
+
+        if self.enable_detailed_eval:
+            # init motion areas and area ranges
+            motion_ranges = [[0.0, 0.7], [0.7, 0.9], [0.9, 1.0]]
+            area_ranges = [[0, 1000 * 1000]]
+
+            if len(motion_ranges) > 1 or len(area_ranges) > 1:
+                part_ap, motion_ap, area_ap = vid_eval_motion(filename, annopath, imageset_file, self.classes_map, annocache,
+                                                          self.motion_iou_path, motion_ranges, area_ranges, ovthresh=0.5)
+                if len(motion_ranges) > 1:
+                    for motion_range_id, motion_range in enumerate(motion_ranges):
+                        print '================================================='
+                        print 'motion [{0:.1f} {1:.1f}]]:'.format( motion_range[0], motion_range[1])
+                        print('Mean AP@0.5 = {:.4f}'.format(np.mean(
+                            [motion_ap[motion_range_id][i] for i in range(len(motion_ap[motion_range_id])) if
+                             motion_ap[motion_range_id][i] >= 0])))
+                        info_str += 'motion [{0:.1f} {1:.1f}]]:'.format(motion_range[0], motion_range[1])
+                        info_str += 'Mean AP@0.5 = {:.4f}'.format(np.mean(
+                            [motion_ap[motion_range_id][i] for i in range(len(motion_ap[motion_range_id])) if
+                             motion_ap[motion_range_id][i] >= 0]))
+
+                if len(area_ranges) > 1:
+                    for area_range_id, area_range in enumerate(area_ranges):
+                        print '================================================='
+                        print 'area [{0} {1} {2} {3}]:'.format(np.sqrt(area_range[0]), np.sqrt(area_range[0]), np.sqrt(area_range[1]), np.sqrt(area_range[1]))
+                        print('Mean AP@0.5 = {:.4f}'.format(np.mean(
+                            [area_ap[area_range_id][i] for i in range(len(area_ap[area_range_id])) if
+                             area_ap[area_range_id][i] >= 0])))
+                        info_str += 'area [{0} {1} {2} {3}]:'.format(np.sqrt(area_range[0]), np.sqrt(area_range[0]),np.sqrt(area_range[1]), np.sqrt(area_range[1]))
+                        info_str += 'Mean AP@0.5 = {:.4f}'.format(np.mean(
+                            [area_ap[area_range_id][i] for i in range(len(area_ap[area_range_id])) if
+                             area_ap[area_range_id][i] >= 0]))
+
+                if len(motion_ranges) > 1 and len(area_ranges) > 1:
+                    for motion_index, motion_range in enumerate(motion_ranges):
+                        for area_index, area_range in enumerate(area_ranges):
+                            print '============================================='
+                            print 'motion [{0:.1f} {1:.1f}], area [{2} {3} {4} {5}]'.format(
+                                motion_range[0], motion_range[1], np.sqrt(area_range[0]), np.sqrt(area_range[0]),
+                                np.sqrt(area_range[1]), np.sqrt(area_range[1]))
+                            print('Mean AP@0.5 = {:.4f}'.format(np.mean(
+                                [part_ap[motion_index][area_index][i] for i in range(len(part_ap[motion_index][area_index])) if
+                                 part_ap[motion_index][area_index][i] >= 0])))
+                            info_str += 'motion [{0:.1f} {1:.1f}], area [{2} {3} {4} {5}]:'.format(
+                                motion_range[0], motion_range[1], np.sqrt(area_range[0]), np.sqrt(area_range[0]),
+                                np.sqrt(area_range[1]), np.sqrt(area_range[1]))
+                            info_str += 'Mean AP@0.5 = {:.4f}'.format(np.mean(
+                                [part_ap[motion_index][area_index][i] for i in range(len(part_ap[motion_index][area_index])) if
+                                 part_ap[motion_index][area_index][i] >= 0]))
+        return info_str
 
     def do_python_eval_gen(self):
         """
@@ -307,7 +475,8 @@ class ImageNetVID(IMDB):
                     f.write((self.pattern[i] % (self.frame_seg_id[i] + j)) + ' ' + str(self.frame_id[i] + j) + '\n')
 
         filename = self.get_result_file_template().format('all')
-        ap = vid_eval(filename, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
+        multifiles=False
+        ap = vid_eval(multifiles,filename, annopath, imageset_file, self.classes_map, annocache, ovthresh=0.5)
         for cls_ind, cls in enumerate(self.classes):
             if cls == '__background__':
                 continue

@@ -128,7 +128,7 @@ git clone https://github.com/msracver/Flow-Guided-Feature-Aggregation.git
 ## Demo
 
 
-1. To run the demo with our trained model (on ImageNet DET + VID train), please download the model manually from [OneDrive](), and put it under folder `model/`.
+1. To run the demo with our trained model (on ImageNet DET + VID train), please download the model manually from [OneDrive](https://1drv.ms/u/s!AqfHNsil2nOiiwDiKev7DB6L9ay7), and put it under folder `model/`.
 
 	Make sure it looks like this:
 	```
